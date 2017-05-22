@@ -1,0 +1,14 @@
+{
+  "name": "bs-websockets",
+  "version": "1.0.0",
+  "description": "WebSockets bindings for BuckleScript",
+  "main": "src/webSockets.re",
+  "scripts": {
+    "start": "bsb -make-world -w"
+  },
+  "author": "CHEN Xian-an <xianan.chen@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "bs-platform": "^1.7.3"
+  }
+}

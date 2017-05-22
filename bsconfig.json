@@ -1,0 +1,8 @@
+  {
+    "name": "bs-websockets",
+    "sources": [
+      {
+        "dir": "src"
+      }
+    ]
+  }
