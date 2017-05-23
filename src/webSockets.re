@@ -1,7 +1,8 @@
 module MessageEvent = {
   type t;
-  external t : t = "MessageEvent" [@@bs.new];
-  external data : t => Js.t 'a = "" [@@bs.get];
+  external data : t => 'a = "" [@@bs.get];
+  external arrayBufferData : t => Js.Typed_array.array_buffer = "data" [@@bs.get];
+  external stringData : t => string = "data" [@@bs.get];
   external origin : t => string = "" [@@bs.get];
   external lastEventId : t => string = "" [@@bs.get];
   external source : t => Js.t {..} = "" [@@bs.get];
@@ -10,19 +11,23 @@ module MessageEvent = {
 
 module CloseEvent = {
   type t;
-  external t : t = "CloseEvent" [@@bs.new];
   external code : t => int = "" [@@bs.get];
   external reason : t => string = "" [@@bs.get];
   external wasClean : t => bool = "" [@@bs.get];
 };
 
-module WebSocket = {
+module type WebSocketMaker = {
   type t;
-  external _make : string => Js.Null_undefined.t 'a => t = "WebSocket" [@@bs.new];
-  let make ::url => _make url Js.Null_undefined.null;
-  let makeWithProtocol ::url protocol::(p: string) => _make url @@ Js.Null_undefined.return p;
-  let makeWithProtocols ::url protocols::(ps: list string) =>
-    _make url (Js.Null_undefined.return @@ Array.of_list ps);
+  let make: string => t;
+  let makeWithProtocols: string => protocols::'a => t;
+};
+
+module MakeWebSocket (Maker: WebSocketMaker) => {
+  type t = Maker.t;
+  let make = Maker.make;
+  let makeWithProtocol url protocol::(p: string) => Maker.makeWithProtocols url protocols::p;
+  let makeWithProtocols url protocols::(ps: list string) =>
+    Maker.makeWithProtocols url protocols::(Array.of_list ps);
   type binaryType =
     | Blob
     | ArrayBuffer;
@@ -41,12 +46,43 @@ module WebSocket = {
     _setBinaryType t str
   };
   external bufferedAmount : t => int64 = "" [@@bs.get];
-  external extensions : t => Js.t 'a = "" [@@bs.get];
-  external onclose : t => (CloseEvent.t => unit) => unit = "" [@@bs.send.pipe : t];
-  external onerror : t => (Js.t {..} => unit) => unit = "" [@@bs.send.pipe : t];
-  external onmessage : t => (MessageEvent.t => unit) => unit = "" [@@bs.send.pipe : t];
-  external onopen : t => (Js.t {..} => unit) => unit = "" [@@bs.send.pipe : t];
+  external extensions : t => 'a = "" [@@bs.get];
+  type event =
+    | Close (CloseEvent.t => unit)
+    | Error (string => unit)
+    | Message (MessageEvent.t => unit)
+    | Open (unit => unit);
+  external _on : string => (Js.t {..} => unit) => unit = "addEventListener" [@@bs.send.pipe : t];
+  let on e t => {
+    let evtname =
+      switch e {
+      | Close _ => "close"
+      | Error _ => "error"
+      | Message _ => "message"
+      | Open _ => "open"
+      };
+    _on
+      evtname
+      (
+        fun jsobj =>
+          switch e {
+          | Close fn => fn @@ Obj.magic jsobj
+          | Error fn => fn jsobj##message
+          | Message fn => fn @@ Obj.magic jsobj
+          | Open fn => fn ()
+          }
+      )
+      t
+  };
   external protocol : t => string = "" [@@bs.get];
   external readyState : t => int32 = "" [@@bs.get];
   external url : t => string = "" [@@bs.get];
 };
+
+module BrowserWebSocket = {
+  type t;
+  external make : string => t = "WebSocket" [@@bs.new];
+  external makeWithProtocols : string => protocols::'a => t = "WebSocket" [@@bs.new];
+};
+
+module WebSocket = MakeWebSocket BrowserWebSocket;
