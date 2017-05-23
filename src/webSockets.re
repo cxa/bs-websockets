@@ -52,7 +52,7 @@ module MakeWebSocket (Maker: WebSocketMaker) => {
     | Error (string => unit)
     | Message (MessageEvent.t => unit)
     | Open (unit => unit);
-  external _on : string => (Js.t {..} => unit) => unit = "addEventListener" [@@bs.send.pipe : t];
+  external _on : string => (Js.t {..} => unit) => t = "addEventListener" [@@bs.send.pipe : t];
   let on e t => {
     let evtname =
       switch e {
@@ -86,3 +86,17 @@ module BrowserWebSocket = {
 };
 
 module WebSocket = MakeWebSocket BrowserWebSocket;
+/** Tips: If you need to make a WebSocket client on Nodejs, you can make a module to implement WebSocketMaker as BrowserWebSocket. e.g.
+  *
+  * WARNING: It's an untested example.
+  *
+ module WSWebSocket = {
+   type t;
+   external make : string => t = "WebSocket" [@@bs.new] [@@bs.module "ws"];
+   external makeWithProtocols : string => protocols::'a => t =
+     "WebSocket" [@@bs.new] [@@bs.module "ws"];
+ };
+
+ module NodeWSClient = MakeWebSocket WSWebSocket;
+ *
+ */
