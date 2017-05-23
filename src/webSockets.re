@@ -20,25 +20,25 @@ module WebSocket = {
   type t;
   external _make : string => Js.Null_undefined.t 'a => t = "WebSocket" [@@bs.new];
   let make ::url => _make url Js.Null_undefined.null;
-  let make_with_protocol ::url protocol::(p: string) => _make url @@ Js.Null_undefined.return p;
-  let make_with_protocols ::url protocols::(ps: list string) =>
+  let makeWithProtocol ::url protocol::(p: string) => _make url @@ Js.Null_undefined.return p;
+  let makeWithProtocols ::url protocols::(ps: list string) =>
     _make url (Js.Null_undefined.return @@ Array.of_list ps);
   type binaryType =
     | Blob
     | ArrayBuffer;
-  external _get_binary_type : t => string = "binaryType" [@@bs.get];
-  external _set_binary_type : t => string => unit = "binaryType" [@@bs.set];
-  let get_binary_type t => {
-    let str = _get_binary_type t;
+  external _binaryType : t => string = "binaryType" [@@bs.get];
+  external _setBinaryType : t => string => unit = "binaryType" [@@bs.set];
+  let binaryType t => {
+    let str = _binaryType t;
     str == "blob" ? Blob : ArrayBuffer
   };
-  let set_binary_type t binaryType => {
+  let setBinaryType t binaryType => {
     let str =
       switch binaryType {
       | Blob => "blob"
       | ArrayBuffer => "arraybuffer"
       };
-    _set_binary_type t str
+    _setBinaryType t str
   };
   external bufferedAmount : t => int64 = "" [@@bs.get];
   external extensions : t => Js.t 'a = "" [@@bs.get];
