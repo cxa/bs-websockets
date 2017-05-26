@@ -38,12 +38,13 @@ module MakeWebSocket (Maker: WebSocketMaker) => {
     str == "blob" ? Blob : ArrayBuffer
   };
   let setBinaryType t binaryType => {
-    let str =
-      switch binaryType {
-      | Blob => "blob"
-      | ArrayBuffer => "arraybuffer"
-      };
-    _setBinaryType t str
+    let typestr =
+      binaryType |> (
+        fun
+        | Blob => "blob"
+        | ArrayBuffer => "arraybuffer"
+      );
+    _setBinaryType t typestr
   };
   external bufferedAmount : t => int64 = "" [@@bs.get];
   external extensions : t => 'a = "" [@@bs.get];
