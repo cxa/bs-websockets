@@ -53,7 +53,7 @@ module MakeWebSocket (Maker: WebSocketMaker) => {
     | Error (string => unit)
     | Message (MessageEvent.t => unit)
     | Open (unit => unit);
-  external _on : string => (Js.t {..} => unit) => t = "addEventListener" [@@bs.send.pipe : t];
+  external _on : string => (Js.t {..} => unit) => unit = "addEventListener" [@@bs.send.pipe : t];
   let on e t => {
     let evtname =
       switch e {
@@ -73,11 +73,20 @@ module MakeWebSocket (Maker: WebSocketMaker) => {
           | Open fn => fn ()
           }
       )
-      t
+      t;
+    t
   };
   external protocol : t => string = "" [@@bs.get];
   external readyState : t => int32 = "" [@@bs.get];
   external url : t => string = "" [@@bs.get];
+  external close : unit => unit = "" [@@bs.send.pipe : t];
+  external closeWithCode : int => unit = "close" [@@bs.send.pipe : t];
+  external closeWithReason : string => unit = "close" [@@bs.send.pipe : t];
+  external closeWithCodeAndReason : int => string => unit = "close" [@@bs.send.pipe : t];
+  external sendString : string => unit = "send" [@@bs.send.pipe : t];
+  external sendArrayBuffer : Js.Typed_array.array_buffer => unit = "send" [@@bs.send.pipe : t];
+  type blob;
+  external sendBlob : blob => unit = "send" [@@bs.send.pipe : t];
 };
 
 module BrowserWebSocket = {
