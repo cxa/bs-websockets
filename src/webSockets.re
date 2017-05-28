@@ -77,7 +77,19 @@ module MakeWebSocket (Maker: WebSocketMaker) => {
     t
   };
   external protocol : t => string = "" [@@bs.get];
-  external readyState : t => int32 = "" [@@bs.get];
+  type readyState =
+    | Connecting
+    | Open
+    | Closing
+    | Closed;
+  external _readyState : t => int = "readyState" [@@bs.get];
+  let readyState t =>
+    switch (_readyState t) {
+    | 0 => Connecting
+    | 1 => Open
+    | 2 => Closing
+    | _ => Closed
+    };
   external url : t => string = "" [@@bs.get];
   external close : unit => unit = "" [@@bs.send.pipe : t];
   external closeWithCode : int => unit = "close" [@@bs.send.pipe : t];
