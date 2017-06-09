@@ -1,6 +1,6 @@
 {
   "name": "bs-websockets",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "WebSockets bindings for BuckleScript",
   "main": "src/webSockets.re",
   "scripts": {

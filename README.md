@@ -8,12 +8,12 @@ Available on npm repository: `yarn add bs-websockets` or `npm i -S bs-websockets
 
 ```reason
 let ws = WebSocket.make webSocketUrl;
-WebSocket.setBinaryType ws ArrayBuffer;
 let handleOpen () => ...;
 let hanhleClose evt /* CloseEvent */ => ...;
 let handleMessage evt /* MessageEvent */ => ...;
 let handleError errmsg => ...;
 ws
+  |> WebSocket.setBinaryType ArrayBuffer
   |> WebSocket.on @@ Open handleOpen
   |> WebSocket.on @@ Close handleClose
   |> WebSocket.on @@ Message handleMessage
