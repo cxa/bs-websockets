@@ -7,6 +7,7 @@ Available on npm repository: `yarn add bs-websockets` or `npm i -S bs-websockets
 ## Example
 
 ```reason
+open WebSockets
 let ws = WebSocket.make webSocketUrl;
 let handleOpen () => ...;
 let hanhleClose evt /* CloseEvent */ => ...;
